@@ -17,7 +17,8 @@ import org.springframework.context.annotation.Configuration;
                 license = @License(name = "Proprietary")
         ),
         servers = {
-                @Server(url = "http://localhost:8080", description = "Local development")
+                @Server(url = "http://localhost:8080", description = "Local"),
+                @Server(url = "https://inventory-management-production-995e.up.railway.app", description = "Production")
         }
 )
 public class OpenApiConfig {
