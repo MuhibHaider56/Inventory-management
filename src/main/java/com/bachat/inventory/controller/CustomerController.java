@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Customers", description = "Manage customers/clients who place orders.")
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/v1/customers")
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -28,8 +28,7 @@ public class CustomerController {
     @Operation(summary = "Create customer")
     @PostMapping
     public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CustomerCreateRequest req) {
-        CustomerResponse created = customerService.create(req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(req));
     }
 
     @Operation(summary = "Get customer by id")
@@ -38,12 +37,19 @@ public class CustomerController {
         return customerService.get(id);
     }
 
-    @Operation(summary = "List customers (paginated)")
+    @Operation(summary = "List customers (paginated, excludes soft-deleted)")
     @GetMapping
     public Page<CustomerResponse> list(@RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return customerService.list(pageable);
+        return customerService.list(PageRequest.of(page, size));
+    }
+
+    @Operation(summary = "Search customers by name or phone")
+    @GetMapping("/search")
+    public Page<CustomerResponse> search(@RequestParam String q,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "20") int size) {
+        return customerService.search(q, PageRequest.of(page, size));
     }
 
     @Operation(summary = "Update customer")
@@ -52,10 +58,7 @@ public class CustomerController {
         return customerService.update(id, req);
     }
 
-    @Operation(
-            summary = "Delete customer",
-            description = "Deletes a customer. If there are existing orders linked to this customer, the API may block deletion depending on business rules."
-    )
+    @Operation(summary = "Soft-delete customer")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         customerService.delete(id);

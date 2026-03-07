@@ -7,7 +7,11 @@ import java.util.List;
 public class InvoiceResponse {
 
     private Long orderId;
+    private String invoiceNumber;
     private String customerName;
+
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
     private LocalDateTime orderDate;
     private LocalDate paymentDueDate;
     private String paymentStatus;
@@ -18,6 +22,24 @@ public class InvoiceResponse {
 
     private List<InvoiceItem> items;
     private List<InvoicePayment> payments;
+    private List<InvoiceExpense> expenses;
+    private BigDecimal totalExpenses;
+
+    public BigDecimal getTotalExpenses() {
+        return totalExpenses;
+    }
+
+    public void setTotalExpenses(BigDecimal totalExpenses) {
+        this.totalExpenses = totalExpenses;
+    }
+
+    public List<InvoiceExpense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(List<InvoiceExpense> expenses) {
+        this.expenses = expenses;
+    }
 
     public Long getOrderId() {
         return orderId;

@@ -15,7 +15,7 @@ public class HealthController {
             summary = "Service health check",
             description = "Returns basic service status information. Useful for monitoring and verifying the backend is running."
     )
-    @GetMapping("/api/health")
+    @GetMapping("/api/v1/health")
     public Map<String, Object> health() {
         return Map.of(
                 "status", "ok",

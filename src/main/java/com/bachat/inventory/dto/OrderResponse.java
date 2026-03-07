@@ -9,6 +9,7 @@ import java.util.List;
 public class OrderResponse {
 
     private Long id;
+    private String invoiceNumber;
     private Long customerId;
     private String customerName;
     private String customerPhone;
@@ -18,6 +19,22 @@ public class OrderResponse {
     private BigDecimal totalAmount;
     private BigDecimal totalProfit;
     private List<OrderItemResponse> items;
+    private BigDecimal totalExpenses;
+    private BigDecimal totalReturns;
+
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
+
+    public BigDecimal getTotalReturns() { return totalReturns; }
+    public void setTotalReturns(BigDecimal totalReturns) { this.totalReturns = totalReturns; }
+
+    public BigDecimal getTotalExpenses() {
+        return totalExpenses;
+    }
+
+    public void setTotalExpenses(BigDecimal totalExpenses) {
+        this.totalExpenses = totalExpenses;
+    }
 
     public OrderResponse() {}
 

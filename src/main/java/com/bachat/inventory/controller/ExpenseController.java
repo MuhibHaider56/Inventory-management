@@ -8,19 +8,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Tag(name = "Expenses", description = "Track business expenses for net profit/loss reporting.")
 @RestController
-@RequestMapping("/api/expenses")
+@RequestMapping("/api/v1/expenses")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -32,8 +33,7 @@ public class ExpenseController {
     @Operation(summary = "Create expense")
     @PostMapping
     public ResponseEntity<ExpenseResponse> create(@Valid @RequestBody ExpenseCreateRequest req) {
-        ExpenseResponse created = expenseService.create(req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(expenseService.create(req));
     }
 
     @Operation(summary = "Get expense by id")
@@ -42,18 +42,14 @@ public class ExpenseController {
         return expenseService.get(id);
     }
 
-    @Operation(
-            summary = "List expenses",
-            description = "Lists expenses. Optionally filter by date range using start/end query parameters."
-    )
+    @Operation(summary = "List expenses (paginated, optional date filter)")
     @GetMapping
-    public List<ExpenseResponse> list(
-            @Parameter(description = "Start date (inclusive) in YYYY-MM-DD", example = "2026-02-01")
-            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate start,
-            @Parameter(description = "End date (inclusive) in YYYY-MM-DD", example = "2026-02-28")
-            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate end
-    ) {
-        return expenseService.list(start, end);
+    public Page<ExpenseResponse> list(
+            @Parameter(description = "Start date (inclusive)") @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate start,
+            @Parameter(description = "End date (inclusive)") @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate end,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return expenseService.list(start, end, PageRequest.of(page, size));
     }
 
     @Operation(summary = "Update expense")

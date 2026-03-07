@@ -7,7 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "expenses")
+@Table(name = "expenses", indexes = {
+    @Index(name = "idx_expense_date", columnList = "expense_date"),
+    @Index(name = "idx_expense_order", columnList = "order_id")
+})
 public class Expense {
 
     @Id
@@ -17,79 +20,47 @@ public class Expense {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(precision = 12, scale = 2, nullable = false)
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "expense_date", nullable = false)
     private LocalDate expenseDate;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Expense() {}
-
-    public Expense(String title, BigDecimal amount, LocalDate expenseDate, String description) {
-        this.title = title;
-        this.amount = amount;
-        this.expenseDate = expenseDate;
-        this.description = description;
-    }
+    // NEW: nullable — null means independent expense, set means linked to an order
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = true)
+    private SalesOrder order;
 
     @PrePersist
     public void prePersist() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (expenseDate == null) expenseDate = LocalDate.now();
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public LocalDate getExpenseDate() {
-        return expenseDate;
-    }
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
 
-    public String getDescription() {
-        return description;
-    }
+    public LocalDate getExpenseDate() { return expenseDate; }
+    public void setExpenseDate(LocalDate expenseDate) { this.expenseDate = expenseDate; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public void setExpenseDate(LocalDate expenseDate) {
-        this.expenseDate = expenseDate;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public SalesOrder getOrder() { return order; }
+    public void setOrder(SalesOrder order) { this.order = order; }
 }

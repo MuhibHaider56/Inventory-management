@@ -16,7 +16,7 @@ import java.util.List;
 
 @Tag(name = "Inventory", description = "Manage stock quantities for products.")
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/v1/inventory")
 public class InventoryController {
 
     private final InventoryService inventoryService;

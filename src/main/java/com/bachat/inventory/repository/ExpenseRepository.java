@@ -13,8 +13,12 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     List<Expense> findAllByExpenseDateBetween(LocalDate start, LocalDate end);
 
+    org.springframework.data.domain.Page<Expense> findByExpenseDateBetween(
+            LocalDate start, LocalDate end, org.springframework.data.domain.Pageable pageable);
+
     @Query("select coalesce(sum(e.amount), 0) from Expense e where e.expenseDate >= :start and e.expenseDate <= :end")
     BigDecimal sumAmountBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
 
+    List<Expense> findByOrderIdOrderByExpenseDateAsc(Long orderId);
 
 }

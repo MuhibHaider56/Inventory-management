@@ -20,15 +20,19 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
+    private final AuditService auditService;
 
-    public InventoryService(InventoryRepository inventoryRepository, ProductRepository productRepository) {
+    public InventoryService(InventoryRepository inventoryRepository,
+                            ProductRepository productRepository,
+                            AuditService auditService) {
         this.inventoryRepository = inventoryRepository;
         this.productRepository = productRepository;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
     public List<InventoryItemResponse> list() {
-        return inventoryRepository.findAll().stream().map(this::toResponse).toList();
+        return inventoryRepository.findAllWithProduct().stream().map(this::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
@@ -40,16 +44,10 @@ public class InventoryService {
 
     @Transactional
     public InventoryItemResponse adjust(InventoryAdjustRequest req) {
-        if (req.getDelta() == null) {
-            throw new BadRequestException("delta is required");
-        }
+        if (req.getDelta() == null) throw new BadRequestException("delta is required");
+        if (req.getProductId() == null) throw new BadRequestException("productId is required");
 
         Long productId = req.getProductId();
-        if (productId == null) {
-            throw new BadRequestException("productId is required");
-        }
-
-        // lock inventory row to avoid race conditions
         Inventory inv = inventoryRepository.findByProductIdForUpdate(productId).orElse(null);
 
         if (inv == null) {
@@ -58,15 +56,20 @@ public class InventoryService {
             inv = new Inventory(p, BigDecimal.ZERO);
         }
 
+        BigDecimal oldQty = inv.getQuantityAvailable();
         BigDecimal delta = MoneyUtil.scale2(req.getDelta());
         BigDecimal newQty = MoneyUtil.add(inv.getQuantityAvailable(), delta);
 
         if (newQty.compareTo(BigDecimal.ZERO) < 0) {
-            throw new BadRequestException("Stock cannot go below 0. Current=" + inv.getQuantityAvailable() + ", delta=" + delta);
+            throw new BadRequestException("Stock cannot go below 0. Current=" + oldQty + ", delta=" + delta);
         }
 
         inv.setQuantityAvailable(newQty);
         Inventory saved = inventoryRepository.save(inv);
+
+        auditService.log("INVENTORY", productId, "ADJUST",
+                "Stock adjusted by " + delta + " for product " + inv.getProduct().getName(),
+                oldQty.toString(), newQty.toString());
 
         return toResponse(saved);
     }
@@ -75,18 +78,14 @@ public class InventoryService {
     public List<InventoryItemResponse> lowStock(BigDecimal threshold) {
         if (threshold == null) threshold = BigDecimal.ZERO;
         threshold = MoneyUtil.scale2(threshold);
-        return inventoryRepository.findAllByQuantityAvailableLessThan(threshold)
+        return inventoryRepository.findLowStockWithProduct(threshold)
                 .stream().map(this::toResponse).toList();
     }
 
     private InventoryItemResponse toResponse(Inventory inv) {
         Product p = inv.getProduct();
         return new InventoryItemResponse(
-                p.getId(),
-                p.getName(),
-                p.getUnit(),
-                inv.getQuantityAvailable(),
-                inv.getLastUpdated()
-        );
+                p.getId(), p.getName(), p.getUnit(),
+                inv.getQuantityAvailable(), inv.getLastUpdated());
     }
 }

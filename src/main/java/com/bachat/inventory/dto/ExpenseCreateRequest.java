@@ -16,8 +16,7 @@ public class ExpenseCreateRequest {
     @Positive(message = "amount must be > 0")
     private BigDecimal amount;
 
-    @NotNull(message = "expenseDate is required")
-    private LocalDate expenseDate;
+    private LocalDate expenseDate; // optional — defaults to today in service if null
 
     private String description;
 

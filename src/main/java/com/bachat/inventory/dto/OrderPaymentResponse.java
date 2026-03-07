@@ -1,7 +1,7 @@
 package com.bachat.inventory.dto;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class OrderPaymentResponse {
 
@@ -17,7 +17,7 @@ public class OrderPaymentResponse {
     }
 
     private BigDecimal amount;
-    private Instant paymentDate;
+    private LocalDateTime paymentDate;
     private String method;
     private String reference;
     private String note;
@@ -40,11 +40,11 @@ public class OrderPaymentResponse {
         this.amount = amount;
     }
 
-    public Instant getPaymentDate() {
+    public LocalDateTime getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Instant paymentDate) {
+    public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
 

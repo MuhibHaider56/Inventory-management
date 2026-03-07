@@ -10,6 +10,11 @@ public class CustomerCreateRequest {
     private String phone;
     private String address;
 
+    private java.math.BigDecimal creditLimit;
+
+    public java.math.BigDecimal getCreditLimit() { return creditLimit; }
+    public void setCreditLimit(java.math.BigDecimal creditLimit) { this.creditLimit = creditLimit; }
+
     public String getName() {
         return name;
     }

@@ -5,10 +5,8 @@ import com.bachat.inventory.domain.Product;
 import com.bachat.inventory.dto.ProductCreateRequest;
 import com.bachat.inventory.dto.ProductResponse;
 import com.bachat.inventory.dto.ProductUpdateRequest;
-import com.bachat.inventory.exception.ConflictException;
 import com.bachat.inventory.exception.ResourceNotFoundException;
 import com.bachat.inventory.repository.InventoryRepository;
-import com.bachat.inventory.repository.OrderItemRepository;
 import com.bachat.inventory.repository.ProductRepository;
 import com.bachat.inventory.util.MoneyUtil;
 import org.springframework.data.domain.Page;
@@ -17,20 +15,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final InventoryRepository inventoryRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final AuditService auditService;
 
     public ProductService(ProductRepository productRepository,
                           InventoryRepository inventoryRepository,
-                          OrderItemRepository orderItemRepository) {
+                          AuditService auditService) {
         this.productRepository = productRepository;
         this.inventoryRepository = inventoryRepository;
-        this.orderItemRepository = orderItemRepository;
+        this.auditService = auditService;
     }
 
     @Transactional
@@ -47,56 +46,73 @@ public class ProductService {
         Inventory inv = new Inventory(saved, MoneyUtil.scale2(initialStock));
         inventoryRepository.save(inv);
 
+        auditService.log("PRODUCT", saved.getId(), "CREATE",
+                "Product created: " + saved.getName() + ", initial stock=" + initialStock);
+
         return toResponse(saved);
     }
 
     @Transactional(readOnly = true)
     public ProductResponse get(Long id) {
-        Product p = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found: id=" + id));
+        Product p = findActiveById(id);
         return toResponse(p);
     }
 
     @Transactional(readOnly = true)
     public Page<ProductResponse> list(Pageable pageable) {
-        return productRepository.findAll(pageable).map(this::toResponse);
+        return productRepository.findByDeletedFalse(pageable).map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> search(String query, Pageable pageable) {
+        return productRepository.searchByName(query, pageable).map(this::toResponse);
     }
 
     @Transactional
     public ProductResponse update(Long id, ProductUpdateRequest req) {
-        Product p = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found: id=" + id));
+        Product p = findActiveById(id);
+
+        String oldInfo = p.getName() + " | cost=" + p.getCostPrice() + " | sell=" + p.getSellingPrice();
 
         p.setName(req.getName().trim());
         p.setUnit(req.getUnit().trim());
         p.setCostPrice(MoneyUtil.scale2(req.getCostPrice()));
         p.setSellingPrice(MoneyUtil.scale2(req.getSellingPrice()));
 
-        return toResponse(productRepository.save(p));
+        Product saved = productRepository.save(p);
+
+        String newInfo = saved.getName() + " | cost=" + saved.getCostPrice() + " | sell=" + saved.getSellingPrice();
+        auditService.log("PRODUCT", saved.getId(), "UPDATE",
+                "Product updated", oldInfo, newInfo);
+
+        return toResponse(saved);
     }
 
     @Transactional
     public void delete(Long id) {
+        Product p = findActiveById(id);
+
+        p.setDeleted(true);
+        p.setDeletedAt(LocalDateTime.now());
+        p.setDeletedBy(auditService.getCurrentUsername());
+        productRepository.save(p);
+
+        auditService.log("PRODUCT", id, "SOFT_DELETE",
+                "Product soft-deleted: " + p.getName());
+    }
+
+    private Product findActiveById(Long id) {
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: id=" + id));
-
-        boolean usedInOrders = orderItemRepository.existsByProduct_Id(id);
-        if (usedInOrders) {
-            throw new ConflictException("Cannot delete product because it exists in order history. Consider keeping it, or implement soft-delete.");
+        if (p.isDeleted()) {
+            throw new ResourceNotFoundException("Product has been deleted: id=" + id);
         }
-
-        productRepository.delete(p);
-        // inventory is removed by FK cascade if configured; if not, you can delete manually.
+        return p;
     }
 
     private ProductResponse toResponse(Product p) {
         return new ProductResponse(
-                p.getId(),
-                p.getName(),
-                p.getUnit(),
-                p.getCostPrice(),
-                p.getSellingPrice(),
-                p.getCreatedAt()
-        );
+                p.getId(), p.getName(), p.getUnit(),
+                p.getCostPrice(), p.getSellingPrice(), p.getCreatedAt());
     }
 }

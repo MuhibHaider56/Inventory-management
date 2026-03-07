@@ -19,5 +19,14 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("select i from Inventory i where i.product.id = :productId")
     Optional<Inventory> findByProductIdForUpdate(@Param("productId") Long productId);
 
-    List<Inventory> findAllByQuantityAvailableLessThan(BigDecimal threshold);
+    // Fetch-join product to avoid N+1 on list
+    @Query("select i from Inventory i join fetch i.product")
+    List<Inventory> findAllWithProduct();
+
+    // Fetch-join product for low-stock query
+    @Query("select i from Inventory i join fetch i.product where i.quantityAvailable < :threshold")
+    List<Inventory> findLowStockWithProduct(@Param("threshold") BigDecimal threshold);
+
+    @Query("select count(i) from Inventory i where i.quantityAvailable < :threshold")
+    long countLowStock(@Param("threshold") BigDecimal threshold);
 }
