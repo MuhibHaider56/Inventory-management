@@ -46,6 +46,16 @@ public class SalesOrder {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false, length = 20)
     private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+    @Column(name = "total_expenses", precision = 12, scale = 2, nullable = false)
+    private BigDecimal totalExpenses = BigDecimal.ZERO;
+
+    public BigDecimal getTotalExpenses() {
+        return totalExpenses;
+    }
+
+    public void setTotalExpenses(BigDecimal totalExpenses) {
+        this.totalExpenses = totalExpenses;
+    }
 
     public SalesOrder() {}
 
@@ -87,6 +97,8 @@ public class SalesOrder {
         if (totalProfit == null) {
             totalProfit = BigDecimal.ZERO;
         }
+        if (totalExpenses == null) totalExpenses = BigDecimal.ZERO; // NEW
+
     }
 
     public Long getId() {

@@ -18,6 +18,15 @@ public class OrderResponse {
     private BigDecimal totalAmount;
     private BigDecimal totalProfit;
     private List<OrderItemResponse> items;
+    private BigDecimal totalExpenses;
+
+    public BigDecimal getTotalExpenses() {
+        return totalExpenses;
+    }
+
+    public void setTotalExpenses(BigDecimal totalExpenses) {
+        this.totalExpenses = totalExpenses;
+    }
 
     public OrderResponse() {}
 

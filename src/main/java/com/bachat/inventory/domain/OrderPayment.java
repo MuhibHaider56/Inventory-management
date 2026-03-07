@@ -1,8 +1,9 @@
 package com.bachat.inventory.domain;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_payments")
@@ -20,8 +21,7 @@ public class OrderPayment {
     private BigDecimal amount;
 
     @Column(name = "payment_date", nullable = false)
-    private Instant paymentDate = Instant.now();
-
+    private LocalDateTime paymentDate = LocalDateTime.now();
     private String method;
 
     private String reference;
@@ -43,7 +43,7 @@ public class OrderPayment {
         return amount;
     }
 
-    public Instant getPaymentDate() {
+    public LocalDateTime getPaymentDate() {
         return paymentDate;
     }
 
@@ -71,7 +71,7 @@ public class OrderPayment {
         this.amount = amount;
     }
 
-    public void setPaymentDate(Instant paymentDate) {
+    public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
 

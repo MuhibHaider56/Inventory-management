@@ -27,7 +27,7 @@ public class ExpenseService {
         Expense e = new Expense();
         e.setTitle(req.getTitle().trim());
         e.setAmount(MoneyUtil.scale2(req.getAmount()));
-        e.setExpenseDate(req.getExpenseDate());
+        e.setExpenseDate(req.getExpenseDate() != null ? req.getExpenseDate() : LocalDate.now()); // NEW
         e.setDescription(req.getDescription());
         return toResponse(expenseRepository.save(e));
     }

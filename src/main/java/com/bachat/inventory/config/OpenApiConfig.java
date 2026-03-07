@@ -18,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
         ),
         servers = {
                 @Server(url = "http://localhost:8080", description = "Local"),
-                @Server(url = "https://inventory-management-production-995e.up.railway.app", description = "Production")
+                @Server(url = "https://inventory-management-production-995e.up.railway.app", description = "Production"),
+                @Server(url = "http://68.178.164.161:8080", description = "Production")
         }
 )
 public class OpenApiConfig {

@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,30 +78,73 @@ public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long> {
     List<SalesOrder> findOverdueOrders(LocalDate today);
 
     @Query("""
-    select o.customer.name,
+    select o.customer.id,
+           o.customer.name,
            sum(o.totalAmount),
-           sum(o.amountPaid)
+           sum(o.amountPaid),
+           sum(o.totalProfit),
+           sum(o.totalExpenses)
     from SalesOrder o
     where o.status <> 'CANCELLED'
-    group by o.customer.name
+    group by o.customer.id, o.customer.name
 """)
     List<Object[]> customerPerformance();
 
     @Query("""
-    select oi.product.name,
+    select o.customer.id,
+           o.customer.name,
+           sum(o.totalAmount),
+           sum(o.amountPaid),
+           sum(o.totalProfit),
+           sum(o.totalExpenses)
+    from SalesOrder o
+    where o.status <> 'CANCELLED'
+    and o.orderDate between :start and :end
+    group by o.customer.id, o.customer.name
+""")
+    List<Object[]> customerPerformanceBetween(@Param("start") LocalDateTime start,
+                                              @Param("end") LocalDateTime end);
+    @Query("""
+    select oi.product.id,
+           oi.product.name,
+           oi.product.unit,
            sum(oi.quantity),
+           sum(oi.totalPrice),
            sum(oi.profit)
     from OrderItem oi
-    group by oi.product.name
+    where oi.order.status <> 'CANCELLED'
+    group by oi.product.id, oi.product.name, oi.product.unit
     order by sum(oi.profit) desc
 """)
     List<Object[]> productProfitability();
 
     @Query("""
-    select date(p.paymentDate), sum(p.amount)
-    from OrderPayment p
-    group by date(p.paymentDate)
-    order by date(p.paymentDate)
+    select oi.product.id,
+           oi.product.name,
+           oi.product.unit,
+           sum(oi.quantity),
+           sum(oi.totalPrice),
+           sum(oi.profit)
+    from OrderItem oi
+    where oi.order.status <> 'CANCELLED'
+    and oi.order.orderDate between :start and :end
+    group by oi.product.id, oi.product.name, oi.product.unit
+    order by sum(oi.profit) desc
 """)
-    List<Object[]> dailyCollections();
+    List<Object[]> productProfitabilityBetween(@Param("start") LocalDateTime start,
+                                               @Param("end") LocalDateTime end);
+
+    @Query("""
+    select cast(p.paymentDate as localdate),
+           sum(p.amount),
+           count(p.id),
+           count(distinct p.order.id)
+    from OrderPayment p
+    where cast(p.paymentDate as localdate) between :start and :end
+    group by cast(p.paymentDate as localdate)
+    order by cast(p.paymentDate as localdate)
+""")
+    List<Object[]> dailyCollections(@Param("start") LocalDate start,
+                                    @Param("end") LocalDate end);
+
 }

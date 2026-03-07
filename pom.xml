@@ -12,7 +12,7 @@
 
     <groupId>com.bachat</groupId>
     <artifactId>inventory-backend</artifactId>
-    <version>1</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>inventory-backend</name>
     <description>Inventory management backend (Spring Boot + MySQL)</description>
 

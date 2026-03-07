@@ -1,21 +1,16 @@
 package com.bachat.inventory.service;
 
-import com.bachat.inventory.dto.CustomerPerformanceResponse;
-import com.bachat.inventory.dto.OverdueResponse;
-import com.bachat.inventory.dto.ProductProfitResponse;
-import com.bachat.inventory.dto.SalesSummaryResponse;
+import com.bachat.inventory.dto.*;
 import com.bachat.inventory.repository.ExpenseRepository;
 import com.bachat.inventory.repository.SalesOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -90,45 +85,83 @@ public class ReportService {
                 })
                 .toList();
     }
-    public List<CustomerPerformanceResponse> getCustomerPerformance() {
+    public List<CustomerPerformanceResponse> getCustomerPerformance(LocalDate start, LocalDate end) {
 
-        return orderRepository.customerPerformance()
-                .stream()
+        List<Object[]> rows;
+
+        if (start != null && end != null) {
+            rows = orderRepository.customerPerformanceBetween(
+                    start.atStartOfDay(),
+                    end.plusDays(1).atStartOfDay()
+            );
+        } else {
+            rows = orderRepository.customerPerformance();
+        }
+
+        return rows.stream()
                 .map(row -> {
                     CustomerPerformanceResponse r = new CustomerPerformanceResponse();
-                    BigDecimal sales = (BigDecimal) row[1];
-                    BigDecimal paid = (BigDecimal) row[2];
 
-                    r.setCustomer((String) row[0]);
+                    BigDecimal sales    = (BigDecimal) row[2];
+                    BigDecimal paid     = (BigDecimal) row[3];
+                    BigDecimal profit   = (BigDecimal) row[4];
+                    BigDecimal expenses = (BigDecimal) row[5];
+
+                    r.setCustomerId((Long) row[0]);
+                    r.setCustomer((String) row[1]);
                     r.setTotalSales(sales);
                     r.setTotalPaid(paid);
                     r.setOutstanding(sales.subtract(paid));
+                    r.setTotalProfit(profit);
+                    r.setTotalExpenses(expenses);
+                    r.setNetProfit(profit.subtract(expenses)); // real net profit
                     return r;
                 })
                 .toList();
     }
-    public List<ProductProfitResponse> getProductProfitability() {
+    public List<ProductProfitResponse> getProductProfitability(LocalDate start, LocalDate end) {
 
-        return orderRepository.productProfitability()
-                .stream()
+        List<Object[]> rows;
+
+        if (start != null && end != null) {
+            rows = orderRepository.productProfitabilityBetween(
+                    start.atStartOfDay(),
+                    end.plusDays(1).atStartOfDay()
+            );
+        } else {
+            rows = orderRepository.productProfitability();
+        }
+
+        return rows.stream()
                 .map(row -> {
                     ProductProfitResponse r = new ProductProfitResponse();
-                    r.setProduct((String) row[0]);
-                    r.setTotalQuantity((BigDecimal) row[1]);
-                    r.setTotalProfit((BigDecimal) row[2]);
+                    r.setProductId((Long) row[0]);
+                    r.setProduct((String) row[1]);
+                    r.setUnit((String) row[2]);
+                    r.setTotalQuantity((BigDecimal) row[3]);
+                    r.setTotalRevenue((BigDecimal) row[4]);
+                    r.setTotalProfit((BigDecimal) row[5]);
                     return r;
                 })
                 .toList();
     }
 
-    public List<Map<String,Object>> getDailyCollections() {
+    public List<DailyCollectionResponse> getDailyCollections(LocalDate start, LocalDate end) {
 
-        return orderRepository.dailyCollections()
+        // default to today if no range passed
+        LocalDate from = start != null ? start : LocalDate.now();
+        LocalDate to   = end   != null ? end   : LocalDate.now();
+
+        return orderRepository.dailyCollections(from, to)
                 .stream()
-                .map(row -> Map.of(
-                        "date", row[0],
-                        "totalCollected", row[1]
-                ))
+                .map(row -> {
+                    DailyCollectionResponse r = new DailyCollectionResponse();
+                    r.setDate((LocalDate) row[0]);
+                    r.setTotalCollected((BigDecimal) row[1]);
+                    r.setTransactionCount((long) row[2]);
+                    r.setOrderCount((long) row[3]);
+                    return r;
+                })
                 .toList();
     }
 

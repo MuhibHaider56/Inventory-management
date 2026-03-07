@@ -1,15 +1,16 @@
 package com.bachat.inventory.controller;
 
 
-import com.bachat.inventory.dto.OrderPaymentResponse;
 import com.bachat.inventory.domain.OrderPayment;
+import com.bachat.inventory.dto.OrderPaymentResponse;
 import com.bachat.inventory.repository.OrderPaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -47,8 +48,8 @@ public class OrderPaymentController {
     // 3️⃣ Get payments between dates
     @GetMapping("/range")
     public ResponseEntity<List<OrderPaymentResponse>> getByRange(
-            @RequestParam Instant start,
-            @RequestParam Instant end) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
 
         List<OrderPayment> payments =
                 orderPaymentRepository.findByPaymentDateBetween(start, end);

@@ -18,6 +18,24 @@ public class InvoiceResponse {
 
     private List<InvoiceItem> items;
     private List<InvoicePayment> payments;
+    private List<InvoiceExpense> expenses;
+    private BigDecimal totalExpenses;
+
+    public BigDecimal getTotalExpenses() {
+        return totalExpenses;
+    }
+
+    public void setTotalExpenses(BigDecimal totalExpenses) {
+        this.totalExpenses = totalExpenses;
+    }
+
+    public List<InvoiceExpense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(List<InvoiceExpense> expenses) {
+        this.expenses = expenses;
+    }
 
     public Long getOrderId() {
         return orderId;
