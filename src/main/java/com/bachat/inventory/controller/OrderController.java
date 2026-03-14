@@ -121,4 +121,17 @@ public class OrderController {
         r.setNote(p.getNote());
         return r;
     }
+
+    @Operation(
+            summary = "Add expense to order",
+            description = "Links an expense (e.g. delivery, toll, tax, damage) to a specific order. Deducts the expense amount from the order's total profit."
+    )
+    @PostMapping("/{orderId}/expenses")
+    public ResponseEntity<OrderResponse> addExpense(
+            @PathVariable Long orderId,
+            @Valid @RequestBody ExpenseCreateRequest req) {
+
+        OrderResponse response = orderService.addExpenseToOrder(orderId, req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }
