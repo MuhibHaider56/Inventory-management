@@ -155,10 +155,10 @@ GET `/api/reports/summary?start=2026-02-01&end=2026-02-29`
 
 ### Deployment guide
 # 1. Upload the jar to server
-scp target/inventory-backend-0.1.0-SNAPSHOT.jar muhib@68.178.164.161:/tmp/app.jar
+scp target/inventory-backend-0.1.0-SNAPSHOT.jar muhib@yourserverip:/tmp/app.jar
 
 # 2. SSH into server
-ssh muhib@68.178.164.161
+ssh muhib@yourserverip
 
 # 3. Stop the app
 sudo systemctl stop inventory
