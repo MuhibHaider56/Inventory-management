@@ -176,7 +176,8 @@ public class PurchaseOrderService {
      * and updates the product's costPrice.
      */
     private void recalculateWAC(Long productId) {
-        Object[] result = poItemRepo.sumQuantityAndCostByProduct(productId);
+        List<Object[]> rows = poItemRepo.sumQuantityAndCostByProduct(productId);
+        Object[] result = rows.get(0);
         BigDecimal totalQty = (BigDecimal) result[0];
         BigDecimal totalCost = (BigDecimal) result[1];
 

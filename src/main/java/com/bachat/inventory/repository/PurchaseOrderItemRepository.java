@@ -20,7 +20,7 @@ public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrder
         where poi.product.id = :productId
         and poi.purchaseOrder.status = 'RECEIVED'
     """)
-    Object[] sumQuantityAndCostByProduct(@Param("productId") Long productId);
+    List<Object[]> sumQuantityAndCostByProduct(@Param("productId") Long productId);
 
     List<PurchaseOrderItem> findByPurchaseOrderId(Long poId);
 }

@@ -103,14 +103,6 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Add expense to order")
-    @PostMapping("/{orderId}/expenses")
-    public ResponseEntity<OrderResponse> addExpense(
-            @PathVariable Long orderId,
-            @Valid @RequestBody ExpenseCreateRequest req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.addExpenseToOrder(orderId, req));
-    }
-
     private OrderPaymentResponse toPaymentResponse(OrderPayment p) {
         OrderPaymentResponse r = new OrderPaymentResponse();
         r.setId(p.getId());
