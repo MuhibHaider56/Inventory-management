@@ -32,15 +32,17 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {})  // use existing CorsConfig
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/v1/auth/login",
-                    "/api/v1/auth/register",
-                    "/api/v1/health",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/v3/api-docs/**"
-                ).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
+                // TODO: re-enable auth after JWT is implemented
+//                .requestMatchers(
+//                    "/api/v1/auth/login",
+//                    "/api/v1/auth/register",
+//                    "/api/v1/health",
+//                    "/swagger-ui/**",
+//                    "/swagger-ui.html",
+//                    "/v3/api-docs/**"
+//                ).permitAll()
+//                .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
