@@ -9,6 +9,7 @@ public class OverdueResponse {
     private BigDecimal balance;
     private LocalDate dueDate;
     private long daysOverdue;
+    private String status; // "OVERDUE" or "PARTIALLY_PAID"
 
     public Long getOrderId() {
         return orderId;
@@ -48,6 +49,14 @@ public class OverdueResponse {
 
     public void setDaysOverdue(long daysOverdue) {
         this.daysOverdue = daysOverdue;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 

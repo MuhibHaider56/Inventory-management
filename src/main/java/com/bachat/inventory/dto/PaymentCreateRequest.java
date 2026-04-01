@@ -1,13 +1,13 @@
 package com.bachat.inventory.dto;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
 public class PaymentCreateRequest {
     @NotNull
-    @Positive
+    @PositiveOrZero
     private BigDecimal amount;
 
     private String method;     // CASH / BANK / EASYPAISA

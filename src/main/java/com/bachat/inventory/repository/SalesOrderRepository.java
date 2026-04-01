@@ -104,7 +104,7 @@ public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long> {
     select o from SalesOrder o
     where o.paymentStatus <> 'PAID'
     and o.status <> 'CANCELLED'
-    and o.paymentDueDate < :today
+    and (o.paymentDueDate < :today or o.amountPaid > 0)
 """)
     List<SalesOrder> findOverdueOrders(LocalDate today);
 

@@ -63,7 +63,9 @@ public class ReportService {
             r.setCustomer(o.getCustomer().getName());
             r.setBalance(o.getTotalAmount().subtract(o.getAmountPaid()));
             r.setDueDate(o.getPaymentDueDate());
-            r.setDaysOverdue(ChronoUnit.DAYS.between(o.getPaymentDueDate(), today));
+            boolean overdue = o.getPaymentDueDate() != null && o.getPaymentDueDate().isBefore(today);
+            r.setDaysOverdue(overdue ? ChronoUnit.DAYS.between(o.getPaymentDueDate(), today) : 0);
+            r.setStatus(overdue ? "OVERDUE" : "PARTIALLY_PAID");
             return r;
         }).toList();
     }
