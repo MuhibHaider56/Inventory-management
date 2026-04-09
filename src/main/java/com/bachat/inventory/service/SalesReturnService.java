@@ -66,9 +66,11 @@ public class SalesReturnService {
             }
 
             BigDecimal returnQty = MoneyUtil.scale2(itemReq.getQuantity());
-            if (returnQty.compareTo(orderItem.getQuantity()) > 0) {
+            BigDecimal alreadyReturned = returnRepo.sumReturnedQtyByOrderItemId(itemReq.getOrderItemId());
+            BigDecimal remaining = MoneyUtil.subtract(orderItem.getQuantity(), alreadyReturned);
+            if (returnQty.compareTo(remaining) > 0) {
                 throw new BadRequestException("Return quantity (" + returnQty
-                        + ") exceeds ordered quantity (" + orderItem.getQuantity()
+                        + ") exceeds remaining returnable quantity (" + remaining
                         + ") for product: " + orderItem.getProduct().getName());
             }
 

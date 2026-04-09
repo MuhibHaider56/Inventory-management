@@ -524,10 +524,12 @@ public class OrderService {
         List<OrderItemResponse> list = new ArrayList<>();
         for (OrderItem item : items) {
             Product p = item.getProduct();
-            list.add(new OrderItemResponse(
+            OrderItemResponse r = new OrderItemResponse(
                     p.getId(), p.getName(), p.getUnit(),
                     item.getQuantity(), item.getSellingPrice(),
-                    item.getCostPrice(), item.getTotalPrice(), item.getProfit()));
+                    item.getCostPrice(), item.getTotalPrice(), item.getProfit());
+            r.setId(item.getId());
+            list.add(r);
         }
         return list;
     }

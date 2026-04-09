@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class OrderItemResponse {
 
+    private Long id;
     private Long productId;
     private String productName;
     private String unit;
@@ -26,6 +27,9 @@ public class OrderItemResponse {
         this.totalPrice = totalPrice;
         this.profit = profit;
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public Long getProductId() {
         return productId;
