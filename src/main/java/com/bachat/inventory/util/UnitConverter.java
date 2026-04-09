@@ -58,8 +58,15 @@ public class UnitConverter {
         if (incomingUnit == null || incomingUnit.isBlank()) {
             return quantity; // no unit sent → assume already in product's unit
         }
-        if (normalise(incomingUnit).equals(normalise(productUnit))) {
+        // Raw string match first — handles non-weight units like "bags", "pieces", etc.
+        if (incomingUnit.trim().equalsIgnoreCase(productUnit == null ? "" : productUnit.trim())) {
             return quantity;
+        }
+        // Both must be known weight units to attempt conversion
+        if (!isKnownUnit(incomingUnit) || !isKnownUnit(productUnit)) {
+            throw new BadRequestException(
+                "Cannot convert between '" + incomingUnit + "' and '" + productUnit + "'. " +
+                "Use the product's native unit: " + productUnit);
         }
         return convert(quantity, incomingUnit, productUnit);
     }

@@ -506,6 +506,10 @@ public class OrderService {
         res.setTotalProfit(order.getTotalProfit());
         res.setTotalExpenses(order.getTotalExpenses());
         res.setTotalReturns(order.getTotalReturns());
+        res.setAmountPaid(order.getAmountPaid());
+        res.setBalanceDue(order.getBalanceDue());
+        res.setPaymentStatus(order.getPaymentStatus());
+        res.setPaymentDueDate(order.getPaymentDueDate());
         res.setItems(null);
         return res;
     }

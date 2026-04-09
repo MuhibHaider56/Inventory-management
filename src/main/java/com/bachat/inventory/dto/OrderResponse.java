@@ -1,8 +1,10 @@
 package com.bachat.inventory.dto;
 
 import com.bachat.inventory.domain.OrderStatus;
+import com.bachat.inventory.domain.PaymentStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +23,10 @@ public class OrderResponse {
     private List<OrderItemResponse> items;
     private BigDecimal totalExpenses;
     private BigDecimal totalReturns;
+    private BigDecimal amountPaid;
+    private BigDecimal balanceDue;
+    private PaymentStatus paymentStatus;
+    private LocalDate paymentDueDate;
 
     public String getInvoiceNumber() { return invoiceNumber; }
     public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
@@ -117,4 +123,13 @@ public class OrderResponse {
     public void setItems(List<OrderItemResponse> items) {
         this.items = items;
     }
+
+    public BigDecimal getAmountPaid() { return amountPaid; }
+    public void setAmountPaid(BigDecimal amountPaid) { this.amountPaid = amountPaid; }
+    public BigDecimal getBalanceDue() { return balanceDue; }
+    public void setBalanceDue(BigDecimal balanceDue) { this.balanceDue = balanceDue; }
+    public PaymentStatus getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
+    public LocalDate getPaymentDueDate() { return paymentDueDate; }
+    public void setPaymentDueDate(LocalDate paymentDueDate) { this.paymentDueDate = paymentDueDate; }
 }
