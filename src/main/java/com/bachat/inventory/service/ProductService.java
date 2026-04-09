@@ -40,10 +40,13 @@ public class ProductService {
         p.setCostPrice(MoneyUtil.scale2(req.getCostPrice()));
         p.setSellingPrice(MoneyUtil.scale2(req.getSellingPrice()));
 
+        BigDecimal initialStock = req.getInitialStock() == null ? BigDecimal.ZERO : MoneyUtil.scale2(req.getInitialStock());
+        p.setInitialStock(initialStock);
+        p.setInitialCostPrice(p.getCostPrice());
+
         Product saved = productRepository.save(p);
 
-        BigDecimal initialStock = req.getInitialStock() == null ? BigDecimal.ZERO : req.getInitialStock();
-        Inventory inv = new Inventory(saved, MoneyUtil.scale2(initialStock));
+        Inventory inv = new Inventory(saved, initialStock);
         inventoryRepository.save(inv);
 
         auditService.log("PRODUCT", saved.getId(), "CREATE",
@@ -91,6 +94,16 @@ public class ProductService {
     @Transactional
     public void delete(Long id) {
         Product p = findActiveById(id);
+
+        // Clear corresponding inventory
+        inventoryRepository.findByProduct_Id(id).ifPresent(inv -> {
+            BigDecimal oldQty = inv.getQuantityAvailable();
+            inv.setQuantityAvailable(BigDecimal.ZERO);
+            inventoryRepository.save(inv);
+            auditService.log("INVENTORY", id, "CLEARED",
+                    "Inventory cleared on product deletion: " + p.getName(),
+                    oldQty.toString(), "0");
+        });
 
         p.setDeleted(true);
         p.setDeletedAt(LocalDateTime.now());

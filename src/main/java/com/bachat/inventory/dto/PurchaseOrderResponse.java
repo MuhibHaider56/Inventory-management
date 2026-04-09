@@ -16,12 +16,15 @@ public class PurchaseOrderResponse {
     private BigDecimal totalAmount;
     private BigDecimal amountPaid;
     private BigDecimal balanceDue;
+    private String paymentStatus;
     private String paymentMethod;
     private String paymentReference;
     private LocalDate paymentDate;
+    private LocalDate paymentDueDate;
     private String notes;
     private String createdBy;
     private List<PurchaseOrderItemResponse> items;
+    private List<PurchaseOrderPaymentResponse> payments;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -41,16 +44,22 @@ public class PurchaseOrderResponse {
     public void setAmountPaid(BigDecimal amountPaid) { this.amountPaid = amountPaid; }
     public BigDecimal getBalanceDue() { return balanceDue; }
     public void setBalanceDue(BigDecimal balanceDue) { this.balanceDue = balanceDue; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getPaymentReference() { return paymentReference; }
     public void setPaymentReference(String paymentReference) { this.paymentReference = paymentReference; }
     public LocalDate getPaymentDate() { return paymentDate; }
     public void setPaymentDate(LocalDate paymentDate) { this.paymentDate = paymentDate; }
+    public LocalDate getPaymentDueDate() { return paymentDueDate; }
+    public void setPaymentDueDate(LocalDate paymentDueDate) { this.paymentDueDate = paymentDueDate; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
     public List<PurchaseOrderItemResponse> getItems() { return items; }
     public void setItems(List<PurchaseOrderItemResponse> items) { this.items = items; }
+    public List<PurchaseOrderPaymentResponse> getPayments() { return payments; }
+    public void setPayments(List<PurchaseOrderPaymentResponse> payments) { this.payments = payments; }
 }

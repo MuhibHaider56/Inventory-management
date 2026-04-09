@@ -15,6 +15,12 @@ public class OrderItemRequest {
     private BigDecimal quantity;
 
     /**
+     * Optional. Unit of the quantity being sent (e.g. "g", "kg", "maund").
+     * If omitted, the product's own unit is assumed (backward-compatible).
+     */
+    private String unit;
+
+    /**
      * Optional override. If not provided, product.sellingPrice will be used.
      */
     private BigDecimal sellingPrice;
@@ -27,6 +33,10 @@ public class OrderItemRequest {
         return quantity;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
     public BigDecimal getSellingPrice() {
         return sellingPrice;
     }
@@ -37,6 +47,10 @@ public class OrderItemRequest {
 
     public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public void setSellingPrice(BigDecimal sellingPrice) {

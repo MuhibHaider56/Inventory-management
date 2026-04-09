@@ -16,6 +16,12 @@ public class InventoryAdjustRequest {
     @NotNull(message = "delta is required")
     private BigDecimal delta;
 
+    /**
+     * Optional. Unit of the delta being sent (e.g. "g", "kg", "maund").
+     * If omitted, the product's own unit is assumed (backward-compatible).
+     */
+    private String unit;
+
     public Long getProductId() {
         return productId;
     }
@@ -24,11 +30,19 @@ public class InventoryAdjustRequest {
         return delta;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
     public void setProductId(Long productId) {
         this.productId = productId;
     }
 
     public void setDelta(BigDecimal delta) {
         this.delta = delta;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

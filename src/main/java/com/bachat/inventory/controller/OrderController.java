@@ -114,6 +114,14 @@ public class OrderController {
         return r;
     }
 
+    @Operation(summary = "Update payment due date for an order",
+               description = "Sets or updates the date by which full payment is expected. Rejected on CANCELLED or fully PAID orders.")
+    @PatchMapping("/{id}/due-date")
+    public OrderResponse updateDueDate(@PathVariable Long id,
+                                       @Valid @RequestBody PurchaseOrderDueDateRequest req) {
+        return orderService.updateDueDate(id, req.getPaymentDueDate());
+    }
+
     @Operation(
             summary = "Add expense to order",
             description = "Links an expense (e.g. delivery, toll, tax, damage) to a specific order. Deducts the expense amount from the order's total profit."

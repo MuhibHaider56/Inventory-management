@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class PaymentCreateRequest {
     @NotNull
@@ -13,6 +14,7 @@ public class PaymentCreateRequest {
     private String method;     // CASH / BANK / EASYPAISA
     private String reference;  // trx id etc
     private String note;
+    private LocalDate paymentDueDate;  // optional: update the order's due date
 
     // getters/setters
 
@@ -46,5 +48,13 @@ public class PaymentCreateRequest {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public LocalDate getPaymentDueDate() {
+        return paymentDueDate;
+    }
+
+    public void setPaymentDueDate(LocalDate paymentDueDate) {
+        this.paymentDueDate = paymentDueDate;
     }
 }

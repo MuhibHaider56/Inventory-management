@@ -1,7 +1,6 @@
 package com.bachat.inventory.controller;
 
-import com.bachat.inventory.dto.PurchaseOrderCreateRequest;
-import com.bachat.inventory.dto.PurchaseOrderResponse;
+import com.bachat.inventory.dto.*;
 import com.bachat.inventory.service.PurchaseOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,5 +56,21 @@ public class PurchaseOrderController {
     @PostMapping("/{id}/cancel")
     public PurchaseOrderResponse cancel(@PathVariable Long id) {
         return poService.cancel(id);
+    }
+
+    @Operation(summary = "Add a payment to a purchase order",
+               description = "Records a partial or full payment. Updates amountPaid and paymentStatus (UNPAID/PARTIALLY_PAID/PAID). Cannot exceed balance due.")
+    @PostMapping("/{id}/payments")
+    public ResponseEntity<PurchaseOrderResponse> addPayment(@PathVariable Long id,
+                                                            @Valid @RequestBody PurchaseOrderPaymentRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(poService.addPayment(id, req));
+    }
+
+    @Operation(summary = "Update payment due date",
+               description = "Sets or updates the date by which full payment is expected.")
+    @PatchMapping("/{id}/due-date")
+    public PurchaseOrderResponse updateDueDate(@PathVariable Long id,
+                                               @Valid @RequestBody PurchaseOrderDueDateRequest req) {
+        return poService.updateDueDate(id, req.getPaymentDueDate());
     }
 }

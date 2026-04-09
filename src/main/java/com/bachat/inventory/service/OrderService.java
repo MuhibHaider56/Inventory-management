@@ -6,6 +6,7 @@ import com.bachat.inventory.exception.BadRequestException;
 import com.bachat.inventory.exception.ResourceNotFoundException;
 import com.bachat.inventory.repository.*;
 import com.bachat.inventory.util.MoneyUtil;
+import com.bachat.inventory.util.UnitConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -77,7 +78,8 @@ public class OrderService {
                 throw new BadRequestException("Product has been deleted: " + product.getName());
             }
 
-            BigDecimal qty = MoneyUtil.scale2(itemReq.getQuantity());
+            BigDecimal qty = MoneyUtil.scale2(
+                    UnitConverter.toProductUnit(itemReq.getQuantity(), itemReq.getUnit(), product.getUnit()));
 
             Inventory inv = inventoryRepository.findByProductIdForUpdate(product.getId())
                     .orElseThrow(() -> new BadRequestException("No inventory record for productId=" + product.getId()));
@@ -236,7 +238,8 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found: id=" + itemReq.getProductId()));
             if (product.isDeleted()) throw new BadRequestException("Product deleted: " + product.getName());
 
-            BigDecimal qty = MoneyUtil.scale2(itemReq.getQuantity());
+            BigDecimal qty = MoneyUtil.scale2(
+                    UnitConverter.toProductUnit(itemReq.getQuantity(), itemReq.getUnit(), product.getUnit()));
 
             Inventory inv = inventoryRepository.findByProductIdForUpdate(product.getId())
                     .orElseThrow(() -> new BadRequestException("No inventory for product: " + product.getName()));
@@ -349,6 +352,23 @@ public class OrderService {
     }
 
     @Transactional
+    public OrderResponse updateDueDate(Long id, java.time.LocalDate dueDate) {
+        SalesOrder order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: id=" + id));
+        if (order.isDeleted()) throw new BadRequestException("Order is deleted");
+        if (order.getStatus() == OrderStatus.CANCELLED) throw new BadRequestException("Cannot update due date of a CANCELLED order");
+        if (order.getPaymentStatus() == PaymentStatus.PAID) throw new BadRequestException("Order already fully paid");
+
+        order.setPaymentDueDate(dueDate);
+        SalesOrder saved = orderRepository.save(order);
+
+        auditService.log("ORDER", id, "DUE_DATE_UPDATED",
+                "Order " + order.getInvoiceNumber() + " paymentDueDate=" + dueDate);
+
+        return toResponseDetailed(saved);
+    }
+
+    @Transactional
     public OrderResponse addExpenseToOrder(Long orderId, ExpenseCreateRequest req) {
         SalesOrder order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found: id=" + orderId));
@@ -454,6 +474,9 @@ public class OrderService {
         orderPaymentRepository.save(p);
 
         order.setAmountPaid(MoneyUtil.add(order.getAmountPaid(), amount));
+        if (req.getPaymentDueDate() != null) {
+            order.setPaymentDueDate(req.getPaymentDueDate());
+        }
         order.setPaymentStatus(calcPaymentStatus(order));
         orderRepository.save(order);
 

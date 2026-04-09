@@ -9,6 +9,7 @@ import com.bachat.inventory.exception.ResourceNotFoundException;
 import com.bachat.inventory.repository.InventoryRepository;
 import com.bachat.inventory.repository.ProductRepository;
 import com.bachat.inventory.util.MoneyUtil;
+import com.bachat.inventory.util.UnitConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +58,8 @@ public class InventoryService {
         }
 
         BigDecimal oldQty = inv.getQuantityAvailable();
-        BigDecimal delta = MoneyUtil.scale2(req.getDelta());
+        BigDecimal delta = MoneyUtil.scale2(
+                UnitConverter.toProductUnit(req.getDelta(), req.getUnit(), inv.getProduct().getUnit()));
         BigDecimal newQty = MoneyUtil.add(inv.getQuantityAvailable(), delta);
 
         if (newQty.compareTo(BigDecimal.ZERO) < 0) {

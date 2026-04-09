@@ -20,6 +20,7 @@ public class PurchaseOrderCreateRequest {
     private String paymentMethod;
     private String paymentReference;
     private LocalDate paymentDate;
+    private LocalDate paymentDueDate;
     private String notes;
 
     public Long getSupplierId() { return supplierId; }
@@ -34,6 +35,8 @@ public class PurchaseOrderCreateRequest {
     public void setPaymentReference(String paymentReference) { this.paymentReference = paymentReference; }
     public LocalDate getPaymentDate() { return paymentDate; }
     public void setPaymentDate(LocalDate paymentDate) { this.paymentDate = paymentDate; }
+    public LocalDate getPaymentDueDate() { return paymentDueDate; }
+    public void setPaymentDueDate(LocalDate paymentDueDate) { this.paymentDueDate = paymentDueDate; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 }

@@ -27,6 +27,12 @@ public class Product {
     @Column(name = "selling_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal sellingPrice;
 
+    @Column(name = "initial_stock", precision = 10, scale = 2, nullable = false)
+    private BigDecimal initialStock = BigDecimal.ZERO;
+
+    @Column(name = "initial_cost_price", precision = 10, scale = 2, nullable = false)
+    private BigDecimal initialCostPrice = BigDecimal.ZERO;
+
     @Column(nullable = false)
     private boolean deleted = false;
 
@@ -67,6 +73,12 @@ public class Product {
 
     public BigDecimal getSellingPrice() { return sellingPrice; }
     public void setSellingPrice(BigDecimal sellingPrice) { this.sellingPrice = sellingPrice; }
+
+    public BigDecimal getInitialStock() { return initialStock; }
+    public void setInitialStock(BigDecimal initialStock) { this.initialStock = initialStock; }
+
+    public BigDecimal getInitialCostPrice() { return initialCostPrice; }
+    public void setInitialCostPrice(BigDecimal initialCostPrice) { this.initialCostPrice = initialCostPrice; }
 
     public boolean isDeleted() { return deleted; }
     public void setDeleted(boolean deleted) { this.deleted = deleted; }
